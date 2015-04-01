@@ -1,0 +1,57 @@
+<script type="text/javascript" src="http://211.149.169.103:8080/resources/js/jquery-1.7.2.min.js"></script>
+	<div id="mygrid1"></div>
+<script>
+	//数据源面板
+        var url=  "http://211.149.169.103:8080/loanSign/loanSignList";
+        var html ="<table width='2000'><tr>";
+html+="<td>序号</td>";
+html+="<td>借款标号</td>";
+html+="<td>标题</td>";
+html+="<td>借款人</td>";
+html+="<td>最小出借单位</td>";
+html+="<td>借款金额</td>";
+html+="<td>还款期限</td>";
+html+="<td>年化利率</td>";
+html+="<td>平台奖励</td>";
+html+="<td>成功借出份数</td>";
+html+="<td>剩余份数</td>";
+html+="<td>还款方式</td>";
+html+="<td>借款标状态</td>";
+html+="<td>是否放款</td>";
+html+="<td>发布时间</td>";
+html+="<td>放款时间</td>";
+html+="<td>流标时间</td>";
+html+="<td>是否显示</td>";
+html+="<td>推荐到首页</td>";
+html+="</tr>";
+//输出每个root子对象的名称和值 
+$.getJSON(url,{},function(data){ 
+//此处返回的data已经是json对象 
+//以下其他操作同第一种情况 
+$.each(data.rows,function(idx,item){ 
+html+="<tr>";
+html+="<td>"+item.id+"</td>";
+html+="<td>"+item.loanNumber+"</td>";
+html+="<td>"+item.loanTitle+"</td>";
+html+="<td>"+item.name+"</td>";
+html+="<td>"+item.loanUnit+"</td>";
+html+="<td>"+item.issueLoan+"</td>";
+html+="<td>"+item.month+"</td>";
+html+="<td>"+item.rate+"</td>";
+html+="<td>"+item.reward+"</td>";
+html+="<td>"+item.successfulLending+"</td>";
+html+="<td>"+item.remainingCopies+"</td>";
+html+="<td>"+item.refundWay+"</td>";
+html+="<td>"+item.loanstate+"</td>";
+html+="<td>"+item.iscredit+"</td>";
+html+="<td>"+item.publishTime+"</td>";
+html+="<td>"+item.creditTime+"</td>";
+html+="<td>"+item.flotTime+"</td>";
+html+="<td>"+item.isShow+"</td>";
+html+="<td>"+item.isRecommand+"</td>";
+html+="</tr>";
+
+}); 
+$("#mygrid1").html(html+"<br>"+data.total); 
+}); 
+</script>

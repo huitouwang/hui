@@ -1,0 +1,75 @@
+/*container*/
+#ym-window{
+	background:#fff;overflow:hidden;
+	font-size:12px;font-family:'宋体';
+}
+
+/*header*/
+.ym-tl{padding-left:4px;background:	#258edb;}
+.ym-tr{padding-right:4px;background:#258edb;}
+.ym-tc{border-top:4px solid #258edb;background:	#258edb;overflow:hidden;height:25px;line-height:25px;}
+.ym-ttc{height:0px}
+.ym-header-text{color:#fff;font-weight:bold;margin-left:5px;float:left}
+.ym-header-tools{float:right;margin-top:1px}
+
+/*body*/
+.ym-ml{background:	#258edb;padding-left:4px;}
+.ym-mr{padding-right:4px;}
+.ym-mc{background:#fff;padding:0}
+.ym-body{overflow:auto;padding:0;font-size:12px;}
+
+/*button*/
+.ym-btn{background:#fff;text-align:center}
+
+/*footer*/
+.ym-bl{background:	#258edb;padding-left:4px}
+.ym-br{padding-right:4px}
+.ym-bc{height:4px;font-size:4px}
+
+/*icon*/
+.ymPrompt_alert{
+	padding-left:90px;
+	background:url(images/4.jpg) no-repeat 20px 50%;
+}
+.ymPrompt_succeed{
+	padding-left:90px;
+	background:url(images/right.gif) no-repeat 20px 50%
+}
+.ymPrompt_error{
+	padding-left:90px;
+	background:url(images/err.gif) no-repeat 20px 50%
+}
+.ymPrompt_close{
+	cursor:pointer;
+	background:url(images/close.png) no-repeat 0 0;
+	width:15px;height:0px;padding-top: 15px;overflow: hidden;
+}
+.ymPrompt_confirm{
+	padding-left:90px;
+	background:url(images/ask.gif) no-repeat 20px 50%
+}
+.ymPrompt_alert .ym-content,.ymPrompt_succeed .ym-content,.ymPrompt_error .ym-content,.ymPrompt_confirm .ym-content{padding:50px 0 0}
+
+/*图标公共定义*/
+.ym-header-tools div{
+	cursor:pointer;
+	width:16px;height:16px;float:left;margin:0 1px;
+	font-family:webdings
+}
+
+/*取消确认按钮样式*/
+input.btnStyle{
+	background:	#258edb;
+	width:80px;height:21px;line-height:21px;
+	font-size:12px;color:#000;border:0;margin:10px 0;
+	text-align: center;;
+}
+
+/*
+input.btnStyle{
+	background:#0073D5;
+	width:80px;height:21px;line-height:21px;
+	font-size:12px;color:#000;border:0;margin:10px 0;
+	text-align: center;;
+}
+*/
