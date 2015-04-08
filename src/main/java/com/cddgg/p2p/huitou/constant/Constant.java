@@ -177,7 +177,7 @@ public interface Constant extends com.cddgg.base.constant.Constant {
 
     /**环讯返回成功码*/
 
-    String SUCCESS = "0000";
+    String SUCCESS = "Y";
     /**短信失效毫秒数*/
     Long MILLISECONDS = 2 * 60 * 1000l;
     

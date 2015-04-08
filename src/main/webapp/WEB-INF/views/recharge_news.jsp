@@ -23,6 +23,7 @@
 		<input type="hidden" name="RetEncodeType" value="${map.RetEncodeType}">
 		<input type="hidden" name="Rettype" value="${map.Rettype}">
 		<input type="hidden" name="ServerUrl" value="${map.ServerUrl}">
+		<input type="hidden" name="attach" value="${map.attach}">
 		<input type="hidden" name="SignMD5" value="${map.SignMD5}">
 	</form>
 	<script type="text/javascript">

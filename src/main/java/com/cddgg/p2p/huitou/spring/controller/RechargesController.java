@@ -34,7 +34,6 @@ import com.ips.security.utility.IpsCrypto;
 @RequestMapping("recharge")
 @CheckLogin(value = CheckLogin.WEB)
 public class RechargesController {
-	
 
 	@Resource
 	private RechargesService rechargesService;
@@ -51,8 +50,8 @@ public class RechargesController {
 	public String openRecharge(HttpServletRequest request,
 			HttpServletResponse response) {
 		// 获取银行信息列表
-//		List<BankInfo> bank = RegisterService.bankList();
-//		request.setAttribute("banks", bank);
+		// List<BankInfo> bank = RegisterService.bankList();
+		// request.setAttribute("banks", bank);
 		return "WEB-INF/views/member/recharge/recharge";
 	}
 
@@ -113,47 +112,52 @@ public class RechargesController {
 			HttpServletResponse response) {
 
 		// 获取当前登录用户的信息
-//		Userbasicsinfo userbasic = (Userbasicsinfo) request.getSession()
-//				.getAttribute(Constant.SESSION_USER);
+		// Userbasicsinfo userbasic = (Userbasicsinfo) request.getSession()
+		// .getAttribute(Constant.SESSION_USER);
 
 		// 将需要提交的信息放在一个实体对象里
-/*		OnlineRechargeInfo rechargeInfo = new OnlineRechargeInfo();
+		/*
+		 * OnlineRechargeInfo rechargeInfo = new OnlineRechargeInfo();
+		 * 
+		 * // 订单编号和日期已初始化 rechargeInfo.setMer_code(ParameterIps.getMercode());
+		 * 
+		 * rechargeInfo.setAmount(tranAmt);
+		 * 
+		 * rechargeInfo.setCurrency_Type("RMB");
+		 * 
+		 * rechargeInfo.setGateway_Type("01");
+		 * 
+		 * rechargeInfo.setOrderEncodeType("5");
+		 * 
+		 * rechargeInfo.setRetEncodeType("17");
+		 */
 
-		// 订单编号和日期已初始化
-		rechargeInfo.setMer_code(ParameterIps.getMercode());
+		// rechargeInfo.setSignMD5(IpsCrypto.md5Sign(signMD5.toString()));
 
-		rechargeInfo.setAmount(tranAmt);
-
-		rechargeInfo.setCurrency_Type("RMB");
-
-		rechargeInfo.setGateway_Type("01");
-
-		rechargeInfo.setOrderEncodeType("5");
-
-		rechargeInfo.setRetEncodeType("17");*/
-
-//		rechargeInfo.setSignMD5(IpsCrypto.md5Sign(signMD5.toString()));
+		// 获取当前登录用户的信息
+		Userbasicsinfo userbasic = (Userbasicsinfo) request.getSession()
+				.getAttribute(Constant.SESSION_USER);
 		
+		String userid = userbasic.getId()+"";
+
 		String url = ParameterIpsUrl.getRechargeurl();
-		
+
 		String ServerUrl = ParameterIps.getUrl();
-		
+
 		String Mer_code = ParameterIps.getMercode();
-		
+
 		String Billno = StringUtil.pMerBillNo();
-		
+
 		String Date = DateUtils.format("yyyyMMdd");
-		
+
 		String amt = StringUtil.formateNumber(Double.valueOf(tranAmt));
-		
-		String signMD5 = "billno" + Billno + "currencytype"
-				+ "RMB" + "amount"
-				+ amt + "date" + Date
-				+ "orderencodetype" + "5"
+
+		String signMD5 = "billno" + Billno + "currencytype" + "RMB" + "amount"
+				+ amt + "date" + Date + "orderencodetype" + "5"
 				+ ParameterIps.getMd5ccertificate();
-		
+
 		String encryptSignMD5 = IpsCrypto.md5Sign(signMD5).toLowerCase();
-		
+
 		Map<String, String> map = new HashMap<String, String>();
 
 		map.put("url", url);
@@ -162,7 +166,7 @@ public class RechargesController {
 
 		map.put("Billno", Billno);
 
-		map.put("Amount",amt);
+		map.put("Amount", amt);
 
 		map.put("Date", Date);
 
@@ -177,15 +181,17 @@ public class RechargesController {
 		map.put("OrderEncodeType", "5");
 
 		map.put("RetEncodeType", "17");
-		
-	    map.put("Rettype", "1");
-	    
-	    map.put("ServerUrl", ServerUrl);
+
+		map.put("Rettype", "1");
+
+		map.put("ServerUrl", ServerUrl);
 
 		map.put("SignMD5", encryptSignMD5);
+		
+		map.put("attach", userid);
 
 		request.setAttribute("map", map);
-		
+
 		return "WEB-INF/views/recharge_news";
 
 	}

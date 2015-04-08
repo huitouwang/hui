@@ -1,5 +1,6 @@
 package com.cddgg.p2p.huitou.spring.service;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.List;
 
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.cddgg.base.entity.ExpensesInfo;
 import com.cddgg.base.spring.orm.hibernate.impl.HibernateSupport;
-import com.cddgg.base.util.StringUtil;
 import com.cddgg.commons.date.DateUtils;
 import com.cddgg.p2p.core.loanquery.LoanSignQuery;
 import com.cddgg.p2p.huitou.admin.spring.service.UserInfoServices;
@@ -22,7 +22,6 @@ import com.cddgg.p2p.huitou.entity.Loanrecord;
 import com.cddgg.p2p.huitou.entity.Loansign;
 import com.cddgg.p2p.huitou.entity.Repaymentrecord;
 import com.cddgg.p2p.huitou.entity.Userbasicsinfo;
-import com.cddgg.p2p.huitou.util.Arith;
 import com.cddgg.p2p.pay.entity.BalanceInquiryInfo;
 import com.cddgg.p2p.pay.entity.RechargeInfo;
 import com.cddgg.p2p.pay.entity.RegisterInfo;
@@ -158,15 +157,15 @@ public class ProcessingService {
 	 */
 	public Boolean recharge(RechargeInfo recharge) {
 		// 获取当前用户账户余额
-		BalanceInquiryInfo money = RegisterService.accountBalance(recharge
-				.getpIpsAcctNo());
+//		BalanceInquiryInfo money = RegisterService.accountBalance(recharge
+//				.getpIpsAcctNo());
 
 		// 处理充值后的信息
 		boolean bool = dao.callProcedureVoid(
 				Enums.PROCEDURES.PROCEDURE_RECHARGE_UPDATE.toString(),
-				recharge.getpTrdAmt(), recharge.getpMerBillNo(),
+				BigDecimal.valueOf(new Double(recharge.getpTrdAmt())), recharge.getpMerBillNo(),
 				recharge.getpIpsBillNo(), recharge.getpMemo2(),
-				Long.parseLong(recharge.getpMemo1()), money.getpBalance());
+				Long.parseLong(recharge.getpMemo1()), 0);
 
 		return bool;
 	}
