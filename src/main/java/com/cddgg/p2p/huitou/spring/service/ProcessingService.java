@@ -248,14 +248,14 @@ public class ProcessingService {
 		Adminuser admin = (Adminuser) request.getSession().getAttribute(
 				Constant.ADMINLOGIN_SUCCESS);
 		// 获取当前用户账户余额
-		BalanceInquiryInfo money = RegisterService
-				.accountBalance(userbasicsinfo.getUserfundinfo().getpIdentNo());
+//		BalanceInquiryInfo money = RegisterService
+//				.accountBalance(userbasicsinfo.getUserfundinfo().getpIdentNo());
 		boolean bool = dao.callProcedureVoid(
 				Enums.PROCEDURES.PROCEDURE_LIANS_INSERT.toString(),
 				Double.parseDouble(auditInfo.getpMemo1()),
 				auditInfo.getpMemo2(), admin.getId(),
 				Long.parseLong(auditInfo.getpMemo3()), userbasicsinfo.getId(),
-				money.getpBalance(), auditInfo.getpBidNo(),
+				"0", auditInfo.getpBidNo(),
 				auditInfo.getpIpsBillNo(),myMoney);
 		return bool;
 	}

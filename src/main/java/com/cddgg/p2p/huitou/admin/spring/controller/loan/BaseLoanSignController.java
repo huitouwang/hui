@@ -64,7 +64,7 @@ import freemarker.template.TemplateException;
 @Controller
 @RequestMapping("/baseLoanSign")
 public class BaseLoanSignController {
-	
+
 	/** baseLoansignService 通用services */
 	@Resource
 	private BaseLoansignService baseLoansignService;
@@ -98,15 +98,16 @@ public class BaseLoanSignController {
 
 	@Resource
 	private UserInfoServices infoServices;
-	
+
 	@Resource
-	private BaseSmsService baseSmsService; 
-	
+	private BaseSmsService baseSmsService;
+
 	@Resource
 	private EmailService emailService;
 
-	 @Resource
-	 private LoansignTypeService loansignTypeService;
+	@Resource
+	private LoansignTypeService loansignTypeService;
+
 	/**
 	 * <p>
 	 * Title: queryBorrowersbaseList
@@ -146,6 +147,7 @@ public class BaseLoanSignController {
 		return "WEB-INF/views/admin/loansign/borrowerlist";
 
 	}
+
 	/**
 	 * <p>
 	 * Title: queryBorrowersbaseList
@@ -176,8 +178,8 @@ public class BaseLoanSignController {
 				cardno);
 		page.setTotalCount(Integer.parseInt(count.toString()));
 		// 分页查询所有借款人
-		Object obj = baseLoansignService.queryBorrowersbaseLists(page, username,
-				cardno);
+		Object obj = baseLoansignService.queryBorrowersbaseLists(page,
+				username, cardno);
 		request.setAttribute("list", obj);
 		request.setAttribute("page", page);
 		request.setAttribute("username", username.trim());
@@ -427,13 +429,14 @@ public class BaseLoanSignController {
 	@ResponseBody
 	@RequestMapping("/publish")
 	public int publish(String loanSignId) throws Exception {
-//		JSONObject json = new JSONObject();
+		// JSONObject json = new JSONObject();
 		// 1、检查是否可以发布
 		Loansign loansign = loanSignQuery.getLoansignById(loanSignId);
-		
-		if(loansign.getLoanType()==1){
-			loansign.setEndTime(DateUtils.add("yyyy-MM-dd", Calendar.DATE, loansign.getLoansignType().getMoney()-1));
-		}else{
+
+		if (loansign.getLoanType() == 1) {
+			loansign.setEndTime(DateUtils.add("yyyy-MM-dd", Calendar.DATE,
+					loansign.getLoansignType().getMoney() - 1));
+		} else {
 			loansign.setEndTime(DateUtils.add("yyyy-MM-dd", Calendar.DATE, 4));
 		}
 		if (loansign.getLoanstate() != 1) {
@@ -443,6 +446,7 @@ public class BaseLoanSignController {
 		boolean bool = baseLoansignService.publish(loansign);
 		return bool ? 1 : 3;
 	}
+
 	/**
 	 * 即将到期的标
 	 * 
@@ -465,7 +469,7 @@ public class BaseLoanSignController {
 	}
 
 	/**
-	 * 通过环迅进行放款操作
+	 * 直接在本系统放款
 	 * 
 	 * @param id
 	 *            标编号
@@ -477,60 +481,113 @@ public class BaseLoanSignController {
 
 		// 获取标的情况
 		Loansign loan = loanSignQuery.getLoansignById(id);
+
 		// 判断该标是否能放款
 		int state = com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO;
+
 		// 1、检查是否可以放款
-		if (!loan.getLoanstate().equals(com.cddgg.p2p.huitou.constant.Constant.STATUES_TWO)) {// 是否是进行中
+		if (!loan.getLoanstate().equals(
+				com.cddgg.p2p.huitou.constant.Constant.STATUES_TWO)) {// 是否是进行中
 			state = com.cddgg.p2p.huitou.constant.Constant.STATUES_TWO;
 		}
 		// 满标才能放款
-		if (state == com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO && loanSignQuery.isFull(id) == false) {
+		if (state == com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO
+				&& loanSignQuery.isFull(id) == false) {
 			state = com.cddgg.p2p.huitou.constant.Constant.STATUES_THERE;
 		}
-		if(state==com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO){
+		if (state == com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO) {
+
+			String issueLoan = loan.getIssueLoan().toString(); // 本期借款额
+
+			String excuteTime = DateUtils.format("yyyy-MM-dd HH:mm:ss");
+
+			String loadId = loan.getId().toString(); // 标的id
+
 			// 封装标的放款实体
 			TenderAuditInfo tend = new TenderAuditInfo(loan.getLoansignbasics()
-					.getpBidNo(), loan.getLoansignbasics().getpContractNo(), loan.getIssueLoan().toString(),
+					.getpBidNo(), loan.getLoansignbasics().getpContractNo(),
+					loan.getIssueLoan().toString(),
 					DateUtils.format("yyyy-MM-dd HH:mm:ss"), loan.getId()
 							.toString());
-			// 将实体进行加密操作
-			ReturnInfo info=null;
+
 			try {
-				Map<String, String> map = RegisterService.registerCall(ParseXML
-						.tenderAuditXml(tend));
-				info = RegisterService.auditTender(map);
-				// 返回成功进行处理
-				if (Constant.SUCCESS.equals(info.getpErrCode())) {
-					if(ParameterIps.pianText(info)){
-						TenderAuditInfo auditInfo = (TenderAuditInfo) XmlParsingBean.simplexml1Object(info.getP3DesXmlPara(),new TenderAuditInfo());
-						// 对借款人账户的处理
-						boolean bool = processingService.tenderAudit(loan.getUserbasicsinfo(),
-								auditInfo, request,loan.getLoansignbasics().getMgtMoney());
-						if(!bool){
-							Log.error("环迅放款成功-->我方放款失败-->数据处理失败-->还款ips编号:"+auditInfo.getpIpsBillNo()+"还款标号:"+loan.getId());
-							state = com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR;
-						}else{
-							// 生成还款计划
-							baseLoansignService.repaymentRecords(loan);
-							state = com.cddgg.p2p.huitou.constant.Constant.STATUES_ONE;
-						}
-					}else{
-						Log.error("该次放款信息不是由环迅返回");
-						state = com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR;
-					}
-				}else{
-					Log.error("环迅放款失败");
+
+				// 对借款人账户的处理
+				boolean bool = processingService.tenderAudit(loan
+						.getUserbasicsinfo(), tend, request, loan
+						.getLoansignbasics().getMgtMoney());
+
+				if (!bool) {
+					Log.error("环迅放款成功-->我方放款失败-->数据处理失败-->还款ips编号:"
+							+ tend.getpIpsBillNo() + "还款标号:" + loan.getId());
 					state = com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR;
+				} else {
+					// 生成还款计划
+					baseLoansignService.repaymentRecords(loan);
+					state = com.cddgg.p2p.huitou.constant.Constant.STATUES_ONE;
 				}
-			} catch (IOException | TemplateException | ParseException e) {
+
+			} catch (ParseException e) {
 				// TODO Auto-generated catch block
-				LOG.error("放款失败,数据解析失败-->需要解析的数据为："+info.getP3DesXmlPara());
+				LOG.error("放款失败", e);
 				state = com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR;
-				e.printStackTrace();
 			}
 		}
 		return state;
 	}
+
+	/**
+	 * 通过环迅进行放款操作
+	 * 
+	 * @param id
+	 *            标编号
+	 * @return 返回放款情况
+	 */
+	/*
+	 * @RequestMapping("/credit")
+	 * 
+	 * @ResponseBody public Integer ipsLoans(String id, HttpServletRequest
+	 * request) {
+	 * 
+	 * // 获取标的情况 Loansign loan = loanSignQuery.getLoansignById(id); // 判断该标是否能放款
+	 * int state = com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO; //
+	 * 1、检查是否可以放款 if
+	 * (!loan.getLoanstate().equals(com.cddgg.p2p.huitou.constant.Constant
+	 * .STATUES_TWO)) {// 是否是进行中 state =
+	 * com.cddgg.p2p.huitou.constant.Constant.STATUES_TWO; } // 满标才能放款 if (state
+	 * == com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO &&
+	 * loanSignQuery.isFull(id) == false) { state =
+	 * com.cddgg.p2p.huitou.constant.Constant.STATUES_THERE; }
+	 * if(state==com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO){ //
+	 * 封装标的放款实体 TenderAuditInfo tend = new
+	 * TenderAuditInfo(loan.getLoansignbasics() .getpBidNo(),
+	 * loan.getLoansignbasics().getpContractNo(),
+	 * loan.getIssueLoan().toString(), DateUtils.format("yyyy-MM-dd HH:mm:ss"),
+	 * loan.getId() .toString()); // 将实体进行加密操作 ReturnInfo info=null; try {
+	 * Map<String, String> map = RegisterService.registerCall(ParseXML
+	 * .tenderAuditXml(tend)); info = RegisterService.auditTender(map); //
+	 * 返回成功进行处理 if (Constant.SUCCESS.equals(info.getpErrCode())) {
+	 * if(ParameterIps.pianText(info)){ TenderAuditInfo auditInfo =
+	 * (TenderAuditInfo)
+	 * XmlParsingBean.simplexml1Object(info.getP3DesXmlPara(),new
+	 * TenderAuditInfo()); // 对借款人账户的处理 boolean bool =
+	 * processingService.tenderAudit(loan.getUserbasicsinfo(), auditInfo,
+	 * request,loan.getLoansignbasics().getMgtMoney()); if(!bool){
+	 * Log.error("环迅放款成功-->我方放款失败-->数据处理失败-->还款ips编号:"
+	 * +auditInfo.getpIpsBillNo()+"还款标号:"+loan.getId()); state =
+	 * com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR; }else{ // 生成还款计划
+	 * baseLoansignService.repaymentRecords(loan); state =
+	 * com.cddgg.p2p.huitou.constant.Constant.STATUES_ONE; } }else{
+	 * Log.error("该次放款信息不是由环迅返回"); state =
+	 * com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR; } }else{
+	 * Log.error("环迅放款失败"); state =
+	 * com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR; } } catch
+	 * (IOException | TemplateException | ParseException e) { // TODO
+	 * Auto-generated catch block
+	 * LOG.error("放款失败,数据解析失败-->需要解析的数据为："+info.getP3DesXmlPara()); state =
+	 * com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR; e.printStackTrace();
+	 * } } return state; }
+	 */
 	/**
 	 * 通过环迅进行流标操作
 	 * 
@@ -547,107 +604,128 @@ public class BaseLoanSignController {
 		// 判断该标是否能放款
 		int state = com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO;
 		// 1、检查是否可以进行流标操作
-		if (!loan.getLoanstate().equals(com.cddgg.p2p.huitou.constant.Constant.STATUES_TWO)) {// 是否是进行中
+		if (!loan.getLoanstate().equals(
+				com.cddgg.p2p.huitou.constant.Constant.STATUES_TWO)) {// 是否是进行中
 			state = com.cddgg.p2p.huitou.constant.Constant.STATUES_TWO;
 		}
-//		// 满标才能放款
-//		if (state == com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO && loanSignQuery.isFull(id) == false) {
-//			state = com.cddgg.p2p.huitou.constant.Constant.STATUES_THERE;
-//		}
-		if(state==com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO){
+		// // 满标才能放款
+		// if (state == com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO &&
+		// loanSignQuery.isFull(id) == false) {
+		// state = com.cddgg.p2p.huitou.constant.Constant.STATUES_THERE;
+		// }
+		if (state == com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO) {
 			// 封装标的放款实体
-			TenderAuditInfo tend = new TenderAuditInfo(loan.getLoansignbasics(),loan.getIssueLoan().toString(),
-					DateUtils.format("yyyy-MM-dd HH:mm:ss"), loan.getId().toString());
+			TenderAuditInfo tend = new TenderAuditInfo(
+					loan.getLoansignbasics(), loan.getIssueLoan().toString(),
+					DateUtils.format("yyyy-MM-dd HH:mm:ss"), loan.getId()
+							.toString());
 			// 将实体进行加密操作
-			ReturnInfo info=null;
+			ReturnInfo info = null;
 			try {
 				Map<String, String> map = RegisterService.registerCall(ParseXML
 						.tenderAuditXml(tend));
 				info = RegisterService.auditTender(map);
 				// 返回成功进行处理
 				if (Constant.SUCCESS.equals(info.getpErrCode())) {
-					if(ParameterIps.pianText(info)){
-						TenderAuditInfo auditInfo = (TenderAuditInfo) XmlParsingBean.simplexml1Object(info.getP3DesXmlPara(),new TenderAuditInfo());
+					if (ParameterIps.pianText(info)) {
+						TenderAuditInfo auditInfo = (TenderAuditInfo) XmlParsingBean
+								.simplexml1Object(info.getP3DesXmlPara(),
+										new TenderAuditInfo());
 						// 对借款人账户的处理
-						boolean bool = processingService.flowStandard(loan,auditInfo.getpIpsBillNo());
-						if(!bool){
-							Log.error("环迅流标成功-->我方流标失败-->数据处理失败-->流标ips编号:"+auditInfo.getpIpsBillNo()+"流标标号:"+loan.getId());
+						boolean bool = processingService.flowStandard(loan,
+								auditInfo.getpIpsBillNo());
+						if (!bool) {
+							Log.error("环迅流标成功-->我方流标失败-->数据处理失败-->流标ips编号:"
+									+ auditInfo.getpIpsBillNo() + "流标标号:"
+									+ loan.getId());
 							state = com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR;
-						}else{
+						} else {
 							state = com.cddgg.p2p.huitou.constant.Constant.STATUES_ONE;
 						}
-					}else{
+					} else {
 						Log.error("该次流标信息不是由环迅返回");
 						state = com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR;
 					}
-				}else{
+				} else {
 					Log.error("环迅流标失败");
 					state = com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR;
 				}
 			} catch (IOException | TemplateException e) {
 				// TODO Auto-generated catch block
-				LOG.error("流标失败,数据解析失败-->需要解析的数据为："+info.getP3DesXmlPara());
+				LOG.error("流标失败,数据解析失败-->需要解析的数据为：" + info.getP3DesXmlPara());
 				state = com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR;
 				e.printStackTrace();
 			}
 		}
 		return state;
 	}
+
 	/**
 	 * 初始化发送信息页面
+	 * 
 	 * @return 返回发送信息页面
 	 */
 	@RequestMapping("openMessage")
-	public String openMessage(Long loanId,HttpServletRequest request){
-		request.setAttribute("loan",baseLoansignService.get(loanId));
+	public String openMessage(Long loanId, HttpServletRequest request) {
+		request.setAttribute("loan", baseLoansignService.get(loanId));
 		return "WEB-INF/views/admin/loansign/add_remind";
 	}
+
 	/**
 	 * 发送短信或邮件
-	 * @param fashion 发送方式0 表示发送短信 1表示发送邮件
-	 * @param content 发送内容
+	 * 
+	 * @param fashion
+	 *            发送方式0 表示发送短信 1表示发送邮件
+	 * @param content
+	 *            发送内容
 	 * @return 发送是否成功
 	 */
 	@RequestMapping("sendSms.htm")
 	@ResponseBody
-	public JSONObject sendChatMessage(int fashion,String content,String phone,String email){
+	public JSONObject sendChatMessage(int fashion, String content,
+			String phone, String email) {
 		JSONObject json = new JSONObject();
-		//发送短信
+		// 发送短信
 		try {
-			if(fashion == com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO){
+			if (fashion == com.cddgg.p2p.huitou.constant.Constant.STATUES_ZERO) {
 				SmsResult sms = baseSmsService.sendSMS(content, phone);
-				if(sms.isSuccess()){
-					return DwzResponseUtil.setJson(json, "200", "短信发送成功",null, "closeCurrent");
-				}else{
-					return DwzResponseUtil.setJson(json, "300", "短信发送失败",null, "closeCurrent");
+				if (sms.isSuccess()) {
+					return DwzResponseUtil.setJson(json, "200", "短信发送成功", null,
+							"closeCurrent");
+				} else {
+					return DwzResponseUtil.setJson(json, "300", "短信发送失败", null,
+							"closeCurrent");
 				}
-			}else{
+			} else {
 				emailService.sendEmail("p2p网贷平台标到期提醒", content, email);
-				return DwzResponseUtil.setJson(json, "200", "邮件发送成功",null, "closeCurrent");
+				return DwzResponseUtil.setJson(json, "200", "邮件发送成功", null,
+						"closeCurrent");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return DwzResponseUtil.setJson(json, "300", "发送失败",null, "closeCurrent");
+			return DwzResponseUtil.setJson(json, "300", "发送失败", null,
+					"closeCurrent");
 		}
-	} 
-	
-    /**
-     * 获取标类型的数据
-     * @return 返回一个json数组
-     */
+	}
+
+	/**
+	 * 获取标类型的数据
+	 * 
+	 * @return 返回一个json数组
+	 */
 	@RequestMapping("loanType.htm")
 	@ResponseBody
-    public JSONArray getLoanType(){
-        JSONArray json = new JSONArray();
-        List<LoansignType> listType = loansignTypeService.queryLoanType();
-        for(int i=0;i<listType.size();i++){
-        	JSONObject jsonObject = new JSONObject();
-        	jsonObject.accumulate("text",listType.get(i).getTypename());
-        	jsonObject.accumulate("value",listType.get(i).getId());
-        	json.add(jsonObject);
-        }
-        return json;
-    }
-	
+	public JSONArray getLoanType() {
+		JSONArray json = new JSONArray();
+		List<LoansignType> listType = loansignTypeService.queryLoanType();
+		for (int i = 0; i < listType.size(); i++) {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.accumulate("text", listType.get(i).getTypename());
+			jsonObject.accumulate("value", listType.get(i).getId());
+			json.add(jsonObject);
+		}
+		return json;
+	}
+
 }

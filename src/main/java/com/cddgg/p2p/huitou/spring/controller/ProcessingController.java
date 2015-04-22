@@ -235,7 +235,7 @@ public class ProcessingController {
 	 * @param request
 	 */
 	@RequestMapping("asynchronismRecharge.htm")
-	public synchronized void asynchronismRecharge(HttpServletRequest request){
+	public synchronized String asynchronismRecharge(HttpServletRequest request){
 		
 		LOGGER.info("支付充值异步返回处理开始！");
 		
@@ -274,7 +274,7 @@ public class ProcessingController {
 			
 			recharge.setpMemo1(attach);
 			
-			recharge.setpMemo2(DateUtils.format("hh:mm:ss"));
+			recharge.setpMemo2(DateUtils.format("yyyy-MM-DD hh:mm:ss"));
 			
 			if(num==0){
 				
@@ -298,49 +298,18 @@ public class ProcessingController {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}
-			}
-			
-			
-/*			if(ParameterIps.pianText(returnInfo)){
-				RechargeInfo recharge = null;
-				try {
-					recharge = (RechargeInfo) RegisterService.decryption(
-							returnInfo.getP3DesXmlPara(), new RechargeInfo());
-					Userbasicsinfo user = userInfoServices.queryBasicsInfoById(recharge.getpMemo1());
-					//查询当前账号是否添加有流水账记录
-					int num = processingService.accountInfoNum(recharge.getpIpsBillNo());
-					if(num==0){
-						boolean bool = processingService.recharge(recharge);
-						if (!bool) {
-							try {
-								financialExceptionNotes
-								.note(ENUM_FINANCIAL_EXCEPTION.RECHARGE,
-										"充值[S]-->环讯确认充值[S]-->添加充值记录及修改用户账户余额[F];MSG:环讯充值已成功,我方提现数据处理失败,回滚环讯资金！;ERR:",
-										user,
-										String.valueOf(recharge.getpTrdAmt()),
-										null, null);
-								LOG.error("环讯充值成功->平台充值数据保存失败->充值金额:"
-										+ recharge.getpTrdAmt() + " 平台充值订单号:"
-										+ recharge.getpMerBillNo() + " 环讯充值订单号:"
-										+ recharge.getpIpsBillNo() + " 充值时间:"
-										+ recharge.getpMemo2() + "当前充值用户编号:"
-										+ recharge.getpMemo1());
-							} catch (ResponseException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-					}
-				} catch (FileNotFoundException | UnsupportedEncodingException e) {
-					e.printStackTrace();
+					return "WEB-INF/views/failure";
+				}else{
+					return "WEB-INF/views/success";
 				}
 			}else{
-				LOG.error("环迅充值失败--》失败原因:该数据不是有ips返回"+returnInfo.getpErrMsg()+"--》加密数据:"+returnInfo.getP3DesXmlPara());
-			}*/
+				LOG.error("已存在流水");
+				return "WEB-INF/views/failure";
+			}
 			
 		}else{
 			LOG.error("环迅充值失败--》失败原因:"+request.getAttribute("msg"));
+			return "WEB-INF/views/failure";
 		}
 	}
 	/**
