@@ -18,7 +18,6 @@ import com.cddgg.commons.date.DateUtils;
 import com.cddgg.commons.normal.Md5Util;
 import com.cddgg.p2p.huitou.constant.Constant;
 import com.cddgg.p2p.huitou.entity.Generalize;
-import com.cddgg.p2p.huitou.entity.MemberNumber;
 import com.cddgg.p2p.huitou.entity.Messagesetting;
 import com.cddgg.p2p.huitou.entity.Messagetype;
 import com.cddgg.p2p.huitou.entity.Userbasicsinfo;
@@ -84,7 +83,7 @@ public class RegistrationService {
      *             DataAccessException
      */
     @Transactional(rollbackFor = Exception.class)
-    public Userbasicsinfo registrationSave(String userName, String email,
+    public Userbasicsinfo registrationSave(String userName, String phone,String email,
             String pwd, Userbasicsinfo promoter,
             HttpServletRequest request) throws DataAccessException,
             IOException, TemplateException {
@@ -102,8 +101,10 @@ public class RegistrationService {
         Usermessage userMessage = new Usermessage();
         //邮箱限制信息
         Validcodeinfo validcodeinfo=new Validcodeinfo();
-        
 
+        userInfo.setpIpsAcctDate(DateUtils.format("YYYYMMDD"));
+        
+        userInfo.setpMerBillNo("KH"+DateUtils.format("YYYYMMDD"));
         // 注册时间
         userInfo.setCreateTime(date);
         // 邮箱激活验证码
@@ -138,8 +139,9 @@ public class RegistrationService {
 
         // 邮箱
         user.setEmail(email);
+        user.setPhone(phone);
         // 是否激活邮箱
-        user.setEmailisPass(0);
+        user.setEmailisPass(1);
         // 默认头像路径http://www.huitou365.com/resources/images/vipuserImgBG1.jpg
         user.setImgUrl("/resources/images/vipuserImgBG5.png");
         // 用户基本信息
@@ -162,6 +164,7 @@ public class RegistrationService {
         userFund.setBonusBalance(0.00);
         // 授信额度
         userFund.setCredit(0.00);
+        userFund.setpIdentNo("KH"+DateUtils.format("YYYYMMDD"));
         // 保存用户资金信息
         commonDao.save(userFund);
 

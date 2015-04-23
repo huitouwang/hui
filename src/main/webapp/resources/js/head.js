@@ -136,7 +136,7 @@ function submit_question() {
 //			ymPrompt.succeedInfo('安全问题设置成功！', 400, 200, '成功', null);
 //			fun_safeverify();
 			$(".layerBodyBox").css("display", "none");
-			$("#verify_ips").css("display", "block");
+			//$("#verify_ips").css("display", "block");
 		} else {
 			ymPrompt.errorInfo('安全问题设置失败！', 400, 200, '失败', null);
 		}

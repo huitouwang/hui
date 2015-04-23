@@ -295,20 +295,23 @@ public class ProcessingController {
 								+ recharge.getpMemo2() + "当前充值用户编号:"
 								+ recharge.getpMemo1());
 					} catch (ResponseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOG.error("error:",e);
 					}
+					request.setAttribute("error",  "环迅充值成功，本地保存失败");
 					return "WEB-INF/views/failure";
 				}else{
+					request.setAttribute("url","/member_index/member_center");
 					return "WEB-INF/views/success";
 				}
 			}else{
 				LOG.error("已存在流水");
+				request.setAttribute("error", "已存在流水");
 				return "WEB-INF/views/failure";
 			}
 			
 		}else{
 			LOG.error("环迅充值失败--》失败原因:"+request.getAttribute("msg"));
+			request.setAttribute("error", "环迅充值失败--》失败原因:"+request.getAttribute("msg"));
 			return "WEB-INF/views/failure";
 		}
 	}

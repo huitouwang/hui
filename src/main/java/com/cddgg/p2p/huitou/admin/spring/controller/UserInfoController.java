@@ -660,7 +660,7 @@ public class UserInfoController {
         // 调用会员注册
         try {
             Userbasicsinfo userbasic = registrationService.registrationSave(
-                    userName, relation.getEmail(), password, null,
+                    userName,relation.getPhone(),relation.getEmail(), password, null,
                     request);
 
             if (userbasic != null) {

@@ -523,11 +523,12 @@ public class BaseLoanSignController {
 					state = com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR;
 				} else {
 					// 生成还款计划
+					loan.setLoanstate(com.cddgg.p2p.huitou.constant.Constant.STATUES_THERE);
 					baseLoansignService.repaymentRecords(loan);
 					state = com.cddgg.p2p.huitou.constant.Constant.STATUES_ONE;
 				}
 
-			} catch (ParseException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				LOG.error("放款失败", e);
 				state = com.cddgg.p2p.huitou.constant.Constant.STATUES_FOUR;

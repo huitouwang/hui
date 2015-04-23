@@ -106,7 +106,7 @@ public class RegistrationController {
      * @return 成功true 失败false
      */
     @RequestMapping(value = "/registration_1_htm", method = RequestMethod.POST)
-    public String registrationMethod(String userName, String email, String pwd,
+    public String registrationMethod(String userName, String phone,String email, String pwd,
             String captcha, String number, HttpServletRequest request,
             HttpServletResponse response) {
 
@@ -130,7 +130,7 @@ public class RegistrationController {
                 pwd = Md5Util.execute(pwd);
                 // 调用注册方法
                 Userbasicsinfo isToPromoter = registrationService
-                        .registrationSave(userName, email, pwd,
+                        .registrationSave(userName,phone,email, pwd,
                                 promoter, request);
                 // 注册成功
                 if (isToPromoter != null) {
