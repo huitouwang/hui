@@ -73,7 +73,7 @@
 								<tbody>
 									<tr>
 										<th>请输入充值金额:</th>
-										<td><input type="text" id="tranAmt" name="tranAmt" class="vipTextBox validate[required,custom[integerNullZero,min[100],max[200000]]]"
+										<td><input type="text" id="tranAmt" name="tranAmt" class="vipTextBox validate[required,custom[numberNullMinus,min[1],max[200000]]]"
 											style="width: 160px;" value="100" /> 元</td>
 									</tr>
 									<!-- <tr>

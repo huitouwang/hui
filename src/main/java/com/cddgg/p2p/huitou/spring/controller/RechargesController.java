@@ -151,6 +151,8 @@ public class RechargesController {
 		String Date = DateUtils.format("yyyyMMdd");
 
 		String amt = StringUtil.formateNumber(Double.valueOf(tranAmt));
+		
+		amt = amt.replace(",", "");
 
 		String signMD5 = "billno" + Billno + "currencytype" + "RMB" + "amount"
 				+ amt + "date" + Date + "orderencodetype" + "5"
