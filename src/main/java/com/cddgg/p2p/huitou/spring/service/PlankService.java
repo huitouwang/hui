@@ -32,7 +32,7 @@ public class PlankService {
 		dao.save(loanrecord);
 		dao.save(accountinfo);
 		dao.save(loansignbasics);
-		String sql = "UPDATE userfundinfo SET userfundinfo.cashBalance=? where id = ?";
+		String sql = "UPDATE userfundinfo SET userfundinfo.cashBalance=userfundinfo.cashBalance-? where id = ?";
 		dao.executeSql(sql,money,loanrecord.getUserbasicsinfo().getId());
 		String sqlrecord = "update blotterrecord set isSucceed=1 where number=?";
 		dao.executeSql(sqlrecord,number);
