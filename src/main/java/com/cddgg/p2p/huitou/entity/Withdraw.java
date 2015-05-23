@@ -36,6 +36,7 @@ public class Withdraw implements java.io.Serializable {
      * 手续费
      */
     private Double deposit;
+
     /**
      * applytime
      */

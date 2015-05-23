@@ -28,6 +28,11 @@ public interface Enums {
          * 提现同步处理
          */
     	PROCEDURE_WITHDRAWAL_RECORD,
+    	
+    	/**
+    	 * 提现申请pass
+    	 */
+    	PROCEDURE_WITHDRAWAL_PASS,
         /**
          * 提现异步处理
          */

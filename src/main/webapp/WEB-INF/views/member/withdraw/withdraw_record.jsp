@@ -68,6 +68,7 @@
 										<th>提现编号</th>
 										<th>提现金额</th>
 										<th>提现手续费</th>
+										<th>提现状态</th>
 										<th>订单号</th>
 										<th>ips订单号</th>
 										<th>提现时间</th>
@@ -80,6 +81,7 @@
 											<td>${no.index+1}</td>
 											<td><fmt:formatNumber value="${withdraw.withdrawAmount}" type="currency"/></td>
 											<td><fmt:formatNumber value="${withdraw.deposit}" type="currency"/></td>
+											<td>${withdraw.withdrawstate}</td>
 											<td>${withdraw.strNum}</td>
 											<td>${withdraw.pIpsBillNo}</td>
 											<td>${withdraw.time}</td>
